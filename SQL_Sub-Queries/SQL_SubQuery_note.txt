@@ -1,0 +1,16 @@
+TYPES OF SUB-Query(based on result return):
+
+1. scalar sub-query (return one single value)
+2. row sub-query (multiple rows but one column)
+3. table sub-query (means returns a table(multiple columns and rows))
+
+
+TYPES OF SUB-Query(based on working):
+1. independent sub-query: inner query does not depend on outer query
+
+2. correlated sub-query: inner query depends on outer query
+
+
+WHERE TO USE SUB-QUERIES:
+
+Insert, Select(Where, select, From, Having), Update, Delete
