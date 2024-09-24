@@ -57,7 +57,57 @@ ON t.f_id = t3.f_id
 ORDER BY (total_value/SUM(total_value) OVER())*100 DESC
 
 
+-- ###################################### Percent Change ######################################################
+-- ((new value - old value)/old value) *100
 
+
+-- ###################################### Percentile_DESC and Percentile_CONT ######################################################
+-- workbench does not support these two functions directly i had o connect workbench with xampp mysql server
+-- Find the median marks of all the students
+USE general;
+SELECT *,
+       PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY marks) OVER (PARTITION BY branch) AS 'median_marks',
+       PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY marks) OVER (PARTITION BY branch) AS 'median_marks_cont'
+FROM marks;
+
+-- ######## interquartile range (search google) ############
+SELECT * FROM (SELECT *,
+       PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY marks) OVER () AS 'q1',
+       PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY marks) OVER () AS 'q2'
+	   FROM marks) t
+WHERE t.marks > t.q1-(1.5*(t.q2-t.q1)) AND t.marks < t.q2+(1.5*(t.q2-t.q1))
+ORDER BY t.student_id;
+
+
+
+-- ###################################### SEGMENTATION(NTILE) ######################################################
+-- Segmentation using NTILE is a technique in SQL for dividing a dataset into equal-sized groups based on some criteria or conditions, and then performing
+-- calculations or analysis on each group separately using window functions.
+
+SELECT *,
+NTILE(3) OVER(ORDER BY marks DESC)
+FROM marks;
+
+-- second problem 
+USE mysql_sorting_grouping;
+
+SELECT brand_name,model,price,
+CASE
+	WHEN bucket = 1 THEN 'Premium'
+    WHEN bucket = 2 THEN 'Medium'
+    WHEN bucket = 3 THEN 'Low'
+END AS 'phone_type'
+FROM (SELECT brand_name, model, price,
+	  NTILE(3) OVER(ORDER BY price DESC) AS 'bucket'
+	  FROM smartphones) t;
+
+
+-- ###################################### CUM_DIST ######################################################
+USE sql_journey;
+SELECT * FROM (SELECT *,
+CUME_DIST() OVER(ORDER BY marks) AS 'percentile_score'
+FROM marks) t 
+WHERE t.percentile_score>0.91
 
 
 
